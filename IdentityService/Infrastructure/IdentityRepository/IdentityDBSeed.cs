@@ -12,7 +12,8 @@ namespace Infrastructure.IdentityRepository
         private readonly RoleManager<AppRole> _roleManager;
 
         private const string AdminName = "admin";
-        private const string RoleName = "admin";
+        private const string AdminRoleName = "admin";
+        private const string UserRoleName = "user";
 
         public IdentityDBSeed(
                 UserManager<AppUser> userManager,
@@ -47,16 +48,23 @@ namespace Infrastructure.IdentityRepository
 
             await _userManager.CreateAsync(admin, "P@ssw0rd");
 
-            if (await _roleManager.FindByNameAsync(RoleName) == null)
+            if (await _roleManager.FindByNameAsync(AdminRoleName) == null)
             {
                 await _roleManager.CreateAsync(new AppRole
                 {
-                    Name = RoleName,
-                    NormalizedName = RoleName
+                    Name = AdminRoleName
                 });
             }
 
-            await _userManager.AddToRoleAsync(admin, RoleName);
+            if (await _roleManager.FindByNameAsync(UserRoleName) == null)
+            {
+                await _roleManager.CreateAsync(new AppRole
+                {
+                    Name = UserRoleName
+                });
+            }
+
+            await _userManager.AddToRoleAsync(admin, AdminRoleName);
         }
     }
 }

@@ -16,6 +16,7 @@ namespace WebApi.Configuration.Autofac
 
             builder.RegisterType<UserRepository>().As<IUserRepository>().InstancePerDependency();
             builder.RegisterType<RoleRepository>().As<IRoleRepository>().InstancePerDependency();
+            builder.RegisterType<UnitOfWork>().As<IUnitOfWork>().SingleInstance();
             builder.RegisterType<TokenService>().As<ITokenService>().InstancePerDependency();
             builder.RegisterType<IdentityDBSeed>().As<IHostedService>();
         }

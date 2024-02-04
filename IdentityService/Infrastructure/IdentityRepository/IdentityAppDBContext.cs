@@ -11,13 +11,13 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.IdentityRepository
 {
-    public class IdentityAppDBContext : IdentityDbContext<AppUser, AppRole, Guid>, IDisposable
+    public class IdentityAppDBContext
+        : IdentityDbContext<AppUser, AppRole, Guid, IdentityUserClaim<Guid>, AppUserRole, IdentityUserLogin<Guid>, IdentityRoleClaim<Guid>, IdentityUserToken<Guid>>,
+        IDisposable
     {
         private IDbContextTransaction _transaction;
 
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         public IdentityAppDBContext(DbContextOptions<IdentityAppDBContext> options) : base(options) { }
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -36,6 +36,14 @@ namespace Infrastructure.IdentityRepository
                 b.HasOne(ud => ud.User).WithOne(u => u.UserDetails).HasForeignKey<UserDetails>(ud => ud.UserId);
                 b.Property(ud => ud.UserId);
                 b.Property(ud => ud.Description).HasMaxLength(500);
+            });
+
+            builder.Entity<AppUserRole>(b =>
+            {
+                b.HasKey(ur => new { ur.UserId, ur.RoleId });
+
+                b.HasOne(ur => ur.Role).WithMany(r => r.UserRoles).HasForeignKey(ur => ur.RoleId).IsRequired();
+                b.HasOne(ur => ur.User).WithMany(u => u.UserRoles).HasForeignKey(u => u.UserId).IsRequired();
             });
         }
 

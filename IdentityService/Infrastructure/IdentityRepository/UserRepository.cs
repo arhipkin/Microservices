@@ -25,6 +25,8 @@ namespace Infrastructure.IdentityRepository
             return await _userManager
                 .Users
                 .Include(x => x.UserDetails)
+                .Include(x => x.UserRoles)
+                .ThenInclude(x => x.Role)
                 .ToArrayAsync(cancellationToken);
         }
 

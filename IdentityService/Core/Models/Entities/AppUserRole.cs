@@ -7,11 +7,9 @@ using System.Threading.Tasks;
 
 namespace Core.Models.Entities
 {
-    public class AppRole : IdentityRole<Guid>
+    public class AppUserRole : IdentityUserRole<Guid>
     {
-        public AppRole() { }
-        public AppRole(string roleName) : base(roleName) { }
-
-        public ICollection<AppUserRole> UserRoles { get; set; }
+        public virtual AppUser User { get; set; }
+        public virtual AppRole Role { get; set; }
     }
 }

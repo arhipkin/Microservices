@@ -9,31 +9,31 @@ namespace Domain.Handlers
     public class CreateUserHandler : IRequestHandler<CreateUserCommand, IdentityResult>
     {
         private readonly IUserRepository _userRepository;
-        private readonly IdentityAppDBContext _identityAppDBContext;
+        private readonly IUnitOfWork _unitOfWork;
 
         public CreateUserHandler(
             IUserRepository userRepository,
-            IdentityAppDBContext identityAppDBContext)
+            IUnitOfWork unitOfWork)
         {
             _userRepository = userRepository;
-            _identityAppDBContext = identityAppDBContext;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<IdentityResult> Handle(CreateUserCommand request, CancellationToken cancellationToken)
         {
-            await _identityAppDBContext.BeginTransactionAsync(cancellationToken);
+            await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
             try
             {
                 await _userRepository.CreateUserAsync(request.User, request.Password);
                 var result = await _userRepository.AddUserToRolesAsync(request.User, request.Roles);
-                await _identityAppDBContext.CommitAsync(cancellationToken);
+                await _unitOfWork.CommitAsync(cancellationToken);
 
                 return result;
             }
             catch (Exception ex)
             {
-                await _identityAppDBContext.RollbackAsync(cancellationToken);
+                await _unitOfWork.RollbackAsync(cancellationToken);
                 throw;
             }
         }
